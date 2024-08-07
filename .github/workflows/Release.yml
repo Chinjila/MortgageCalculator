@@ -20,7 +20,7 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release /p:Version=${VERSION} --no-build
     - name: Pack
-      run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
+      run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output . -p:PackageID=Chinjia.MortgageCalculator
     - name: Push
       run: dotnet nuget push Chinjia.MortgageCalculator.${VERSION}.nupkg --source https://nuget.pkg.github.com/chinjila/index.json --api-key ${GITHUB_TOKEN}
       env:
