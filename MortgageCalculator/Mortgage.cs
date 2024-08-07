@@ -13,7 +13,7 @@ namespace MortgageCalculator
         public decimal CurrentPrincipal;
         public decimal OriginalInterestRate;
 
-        public MortgageDuration LoanDuration { get; }
+        public int LoanDuration { get; }
 
         public MortgageType MortgageType;
         public List<Payment> Payments;
@@ -27,18 +27,21 @@ namespace MortgageCalculator
         { throw new NotImplementedException(); }
         public List<Payment> GetAmortizationSchedule(int numberOfPayments)
         { throw new NotImplementedException(); }
-        public Mortgage(DateTime mortgageOriginationDate, MortgageDuration duration) : this(mortgageOriginationDate, duration, 200000M, 0.065M)
-        { }
-
+        
         //create a constructor that accept the origination date and an enum
         // for 15 or 30 year, throw exception if origination < today - in the past
-        public Mortgage(DateTime mortgageOriginationDate, MortgageDuration duration, Decimal originalLoanAmount, Decimal originalInterestRate)
+        public Mortgage(DateTime mortgageOriginationDate, MortgageDuration duration, Decimal originalLoanAmount, Decimal originalInterestRateInPercentage):
+        this(mortgageOriginationDate, originalLoanAmount, (int)duration, originalInterestRateInPercentage)
+        {
+            ;
+        }
+        public Mortgage(DateTime mortgageOriginationDate,  Decimal originalLoanAmount, int durationInMonth, Decimal originalInterestRateInPercentage)
         {
             if (mortgageOriginationDate < System.DateTime.Now.AddDays(-3))
             {
                 throw new Exception("Mortgage can not be originated in the past.");
             }
-            if (originalLoanAmount <= 0 | originalInterestRate <= 0) throw new ArgumentOutOfRangeException();
+            if (originalLoanAmount <= 0 | originalInterestRateInPercentage <= 0) throw new ArgumentOutOfRangeException();
             // right click solution -> Add -> New Project -> search for MSTest Project
             // Name the project MortgageLibTest
             // delete UnitTest1.cs
@@ -54,18 +57,18 @@ namespace MortgageCalculator
             // top menu-> Test -> Run All Tests
             Payments = new List<Payment>();
             this.OriginalPrincipalAmount = originalLoanAmount;
-            this.OriginalInterestRate = originalInterestRate;
-            this.LoanDuration = duration;
+            this.OriginalInterestRate = originalInterestRateInPercentage;
+            this.LoanDuration = durationInMonth;
             this.OriginationDate = mortgageOriginationDate;
-            var payment = this.calculateMonthlyPayment((int)duration);
+            var payment = this.calculateMonthlyPayment(durationInMonth);
             var loanBalance = this.OriginalPrincipalAmount;
 
-            for (int i = 0; i < (int)duration; i++)
+            for (int i = 0; i < durationInMonth; i++)
             {
                 var paymentNumber = i + 1;
-                var interestAmount = loanBalance * this.OriginalInterestRate / 12;
+                var interestAmount = loanBalance * this.OriginalInterestRate / 1200;
                 var principalAmount = payment - interestAmount;
-                if (paymentNumber == (int)duration)
+                if (paymentNumber == durationInMonth)
                 {
                     payment = loanBalance;
                     principalAmount = loanBalance;
@@ -124,7 +127,7 @@ namespace MortgageCalculator
 
         internal Decimal calculateMonthlyPayment(int numberOfPayment)
         {
-            double r = (double)(this.OriginalInterestRate / 12);
+            double r = (double)(this.OriginalInterestRate / 1200);
             double p = (double)OriginalPrincipalAmount;
             double monthlyPayment = r * p * (Math.Pow(1 + r, numberOfPayment)) / (Math.Pow(1 + r, numberOfPayment) - 1);
 
