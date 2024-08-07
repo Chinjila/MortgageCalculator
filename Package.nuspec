@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Package</id>
+    <version>1.0.0</version>
+    <authors>Chinjila</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/Chinjila/MortgageCalculator</projectUrl>
+    <description>This package contains a class library in calculating mortgage payment.</description>
+    <releaseNotes>Initial release for demo purpose</releaseNotes>
+    <copyright>$copyright$</copyright>
+    
+    <dependencies>
+      <group targetFramework=".NETStandard2.1">
+      </group>
+    </dependencies>
+  </metadata>
+</package>
