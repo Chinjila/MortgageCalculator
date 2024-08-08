@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Interactive": {
+      "commandName": "Project"
+    },
+    "Batch": {
+      "commandName": "Project",
+      "commandLineArgs": "200000\r\n6.5\r\n180"
+    }
+  }
+}
