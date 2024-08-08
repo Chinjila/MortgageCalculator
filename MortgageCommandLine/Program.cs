@@ -1,15 +1,19 @@
 ﻿using MortgageCalculator;
 using Spectre.Console;
 using System.CommandLine;
+using System.ComponentModel.Design;
 namespace MortgageCommandLine
 {
     internal class Program
     {
+        static bool isBatch=false;
         static async Task Main(string[] args)
         {
 
             var rootCommand = new RootCommand("Mortgage Calculator Console App");
+
             var interactiveCommand = new Command("interactive", "Run calculator interactively.");
+            
             var batchCommand = new Command("batch", "Run calculator in batch mode.");
             var loanOption = new Option<decimal?>(
                   name: "--loan",
@@ -50,6 +54,7 @@ namespace MortgageCommandLine
 
         private static void RunBatch(decimal loanOption, decimal interestOption, int durationOption)
         {
+            isBatch = true;
             PrintTable(loanOption, interestOption, durationOption);
         }
 
@@ -68,8 +73,25 @@ namespace MortgageCommandLine
                                                   durationInMonth: durationInYear * 12,
                                                   originalInterestRateInPercentage: interest);
             // Create a table
-            var table = PrepareTable(m);
-            AnsiConsole.Write(table);
+            if (isBatch)
+            {
+                foreach (var p in m.Payments)
+                {
+                    Console.WriteLine($"{p.PaymentNumber.ToString("n0")}," +
+                        $"{p.PaymentAmount.ToString("F2")}," +
+                        $"{p.PrincipalAmount.ToString("F2")}," +
+                        $"{p.InterestAmount.ToString("F2")}," +
+                        $"{p.paymentDate.ToShortDateString()}" +
+                        $",{p.LoanBalance.ToString("F2")}");
+                }
+
+            }
+            else
+            {
+                var table = PrepareTable(m);
+                AnsiConsole.Write(table);
+            }  
+            
         }
 
         private static Table PrepareTable(Mortgage m)
