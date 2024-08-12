@@ -5,11 +5,11 @@
       "distributionName": ""
     },
     "Interactive": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "interactive"
     },
     "Batch": {
-      "commandName": "Project",
-      "commandLineArgs": "200000\r\n6.5\r\n180"
+      "commandName": "Project"
     }
   }
 }

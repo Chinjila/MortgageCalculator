@@ -47,7 +47,7 @@ namespace MortgageCommandLine
                 durationOption)
                 ;
             interactiveCommand.SetHandler(() => RunInteractive());
-            int result = rootCommand.InvokeAsync(args).Result;
+            await rootCommand.InvokeAsync(args);
 
             return;
         }
@@ -88,13 +88,37 @@ namespace MortgageCommandLine
             }
             else
             {
-                var table = PrepareTable(m);
-                AnsiConsole.Write(table);
-            }  
-            
+                int currentPage = 0;
+                int pageSize = 20;
+                int recordNumber = m.Payments.Count;
+                int numberOfPages = recordNumber % pageSize == 0 ? recordNumber / pageSize - 1 : recordNumber / pageSize;
+                char cmd = ' ';
+                do
+                {
+                    switch (char.ToUpper(cmd))
+                    {
+                        case 'F':
+                            currentPage = 0; break;
+                        case 'N':
+                            currentPage = Math.Min(numberOfPages, currentPage + 1); break;
+                        case 'P':
+                            currentPage = Math.Max(0, currentPage - 1); break;
+                        case 'L':
+                            currentPage = numberOfPages; break;
+                        default:
+                            currentPage = 0;
+                            break;
+                    }
+                    var table = PrepareTable(m, currentPage, pageSize);
+                    AnsiConsole.Write(table);
+                    cmd = AnsiConsole.Ask<char>("[red]Q[/]uit, [red]F[/]irst Page,[red]P[/]revious Page,[red]N[/]ext Page,[red]L[/]ast Page",'Q');
+                } while (!('Q' == Char.ToUpper(cmd)));
+
+            }
+
         }
 
-        private static Table PrepareTable(Mortgage m)
+        private static Table PrepareTable(Mortgage m,int pageNumber, int pageSize)
         {
             var table = new Table();
 
@@ -106,7 +130,7 @@ namespace MortgageCommandLine
             table.AddColumn(new TableColumn("[red]Principle remain[/]").Centered());
             table.AddColumn(new TableColumn("[red]Interest Paid[/]").Centered());
             decimal runningInterestTotal = 0;
-            foreach (var p in m.Payments) {
+            foreach (var p in m.Payments.Skip(pageNumber * pageSize).Take(pageSize)) {
                 runningInterestTotal += p.InterestAmount;
                 table.AddRow(new Markup(p.paymentDate.ToShortDateString()),
                     new Markup(p.PrincipalAmount.ToString("c")),
